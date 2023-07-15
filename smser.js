@@ -6,7 +6,7 @@ const botly = new Botly({
   verifyToken: process.env.VERIFY_TOKEN,
   webHookPath: process.env.WB_PATH,
   notificationType: Botly.CONST.REGULAR,
-  FB_URL: "https://graph.facebook.com/v13.0/",
+  FB_URL: "https://graph.facebook.com/v2.6/",
 });
 /* ----- DB ----- */
 const { createClient } = require('@supabase/supabase-js');
@@ -110,7 +110,7 @@ const verifySMS = (senderId, phone, country, phonecode, smsid, vercode) => {
     .then(async (response) => {
       console.log(response.data)
       if (response.data.status == 2) {
-        await updateUser(senderId, { token: response.data.verifyToken })
+        await updateUser(senderId, { token: response.data.installationId })
               .then((data, error) => {
                 if (error) {
                     botly.sendText({id: senderId, text: "حدث خطأ"});
