@@ -154,6 +154,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use("/webhook", botly.router());
 
 botly.on("message", async (senderId, message) => {
+  botly.sendText({ id: senderId, text: "يجري إصلاح الصفحة الان :) تمهل قليلا...." });
+  /*
   const user = await userDb(senderId);
     const timer = new Date().getTime() + 24 * 60 * 60 * 1000;
     const time = new Date().getTime();
@@ -369,9 +371,11 @@ botly.on("message", async (senderId, message) => {
       });
     }
     //  e n d  //
+    */
 });
 
 botly.on("postback", async (senderId, message, postback) => {
+  /*
     // s t a r t  //
     const user = await userDb(senderId);
     const time = new Date().getTime();
@@ -799,6 +803,7 @@ botly.on("postback", async (senderId, message, postback) => {
             });
     }
     //   e n d   //
+    */
   });
   /*------------- RESP -------------*/
   /*
