@@ -375,6 +375,7 @@ botly.on("postback", async (senderId, message, postback) => {
     // s t a r t  //
     const user = await userDb(senderId);
     const time = new Date().getTime();
+    const timer = new Date().getTime() + 24 * 60 * 60 * 1000;
     if (user[0]) {
       if (message.postback) {
         // Normal (buttons)

@@ -105,6 +105,7 @@ const verifySMS = (senderId, phone, country, phonecode, smsid, vercode) => {
     requestId: smsid,
     token: vercode,
   };
+  console.log(verifyData)
   axiosInstance.post(`https://account-asia-south1.truecaller.com/v1/verifyOnboardingOtp`, verifyData)
     .then(async (response) => {
       if (response.data.status == 2) {
