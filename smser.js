@@ -108,8 +108,8 @@ const verifySMS = (senderId, phone, country, phonecode, smsid, vercode) => {
   console.log(verifyData)
   axiosInstance.post(`https://account-asia-south1.truecaller.com/v1/verifyOnboardingOtp`, verifyData)
     .then(async (response) => {
+      console.log(response.data)
       if (response.data.status == 2) {
-        console.log(response.data)
         await updateUser(senderId, { token: response.data.verifyToken })
               .then((data, error) => {
                 if (error) {
