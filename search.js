@@ -49,7 +49,7 @@ const searchPhone = async (senderId, country, query, code) => {
   var tokens = await getTokens();
   var random = Math.floor(Math.random() * tokens.length);
   var research = function (token, key) {
-    axios.get(`https://search5-noneu.truecaller.com/v2/bulk?q=${query}&countryCode=${country}&type=14&encoding=json`, {
+    axios.get(`https://search5-noneu.truecaller.com/v2/search?q=${query}&countryCode=${country}&type=4&encoding=json`, {
           headers: {
             authorization: `Bearer ${token}`,
             "content-type": "application/json",
@@ -57,13 +57,13 @@ const searchPhone = async (senderId, country, query, code) => {
         })
       .then((response) => {
           if (response.data.data[0]) {
-            if (response.data.data[0].value.name) {
+            if (response.data.data[0].name) {
               botly.sendGeneric({
                 id: senderId,
                 elements: {
-                  title: response.data.data[0].value.name,
+                  title: response.data.data[0].name,
                   image_url: "https://i.ibb.co/VTXKnYJ/gardencallerbot.png",
-                  subtitle: `${response.data.data[0].value.phones[0].carrier} | ${response.data.data[0].value.phones[0].nationalFormat}`,
+                  subtitle: `${response.data.data[0].phones[0].carrier} | ${response.data.data[0].phones[0].nationalFormat}`,
                   buttons: [
                     botly.createPostbackButton("الإعدادات ⚙️", "profile"),
                     botly.createPostbackButton("تسجيل برقم الهاتف 📱", "paid"),
@@ -133,6 +133,15 @@ const searchPhone = async (senderId, country, query, code) => {
                       console.log("DB-ERR : ", error);
                     }
                     console.log("DB-CLN");
+                    retry();
+                  });
+          } else if (error.response.data.status == 42601) {
+            await updateUser(key, {token: null, phone: null, lastsms: null, smsid: null, smsed: false, mode: "free"})
+                  .then((data, error) => {
+                    if (error) {
+                      console.log("DB-ERR : ", error);
+                    }
+                    console.log("UP-CLN");
                     retry();
                   });
           } else {

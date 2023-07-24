@@ -66,22 +66,22 @@ async function searcher(senderId, query, country, token, code) {
       return code + qr.replace(/\D/g, '');
     }
   };
-    axios.get(`https://search5-noneu.truecaller.com/v2/bulk?q=${query}&countryCode=${country}&type=14&encoding=json`, { headers: {
+    axios.get(`https://search5-noneu.truecaller.com/v2/search?q=${query}&countryCode=${country}&type=4&encoding=json`, { headers: {
         authorization: `Bearer ${token}`,
         "content-type": "application/json",
       }})
       .then(response => {
           if (response.data.data[0] != null) {
-            if (response.data.data[0].value.name) {
-              if (response.data.data[0].value.image) {
+            if (response.data.data[0].name) {
+              if (response.data.data[0].image) {
                 botly.sendGeneric({
                   id: senderId,
                   elements: {
-                    title: response.data.data[0].value.name,
-                    image_url: response.data.data[0].value.image,
-                    subtitle: `${response.data.data[0].value.phones[0].carrier} | ${response.data.data[0].value.phones[0].nationalFormat}`,
+                    title: response.data.data[0].name,
+                    image_url: response.data.data[0].image,
+                    subtitle: `${response.data.data[0].phones[0].carrier} | ${response.data.data[0].phones[0].nationalFormat}`,
                     buttons: [
-                      botly.createWebURLButton("WhatsApp 📞",`wa.me/${response.data.data[0].value.phones[0].e164Format}`),
+                      botly.createWebURLButton("WhatsApp 📞",`wa.me/${response.data.data[0].phones[0].e164Format}`),
                       botly.createPostbackButton("الإعدادات ⚙️", "profile")
                     ],
                   },
@@ -91,11 +91,11 @@ async function searcher(senderId, query, country, token, code) {
                 botly.sendGeneric({
                   id: senderId,
                   elements: {
-                    title: response.data.data[0].value.name,
+                    title: response.data.data[0].name,
                     image_url: "https://i.ibb.co/StcT5v2/unphoto.jpg",
-                    subtitle: `${response.data.data[0].value.phones[0].carrier} | ${response.data.data[0].value.phones[0].nationalFormat}`,
+                    subtitle: `${response.data.data[0].phones[0].carrier} | ${response.data.data[0].phones[0].nationalFormat}`,
                     buttons: [
-                      botly.createWebURLButton("WhatsApp 📞", `wa.me/${response.data.data[0].value.phones[0].e164Format}`),
+                      botly.createWebURLButton("WhatsApp 📞", `wa.me/${response.data.data[0].phones[0].e164Format}`),
                       botly.createPostbackButton("الإعدادات ⚙️", "profile"),
                     ],
                   },
@@ -143,8 +143,15 @@ async function searcher(senderId, query, country, token, code) {
                     console.log("PAID-CLN");
                     botly.sendText({ id: senderId, text: "تم إنهاء حسابك. المرجو استعمال رقم اخر. او الإكتفاء بالوضع المجاني" });
                   });
-        } else {
-          
+        } else if (error.response.data.status == 42601) {
+          await updateUser(senderId, {token: null, phone: null, lastsms: null, smsid: null, smsed: false, mode: "free"})
+                  .then((data, error) => {
+                    if (error) {
+                      console.log("DB-ERR : ", error);
+                    }
+                    console.log("PAID-CLN");
+                    botly.sendText({ id: senderId, text: "الرقم الذي سجلت به يتطلب تحقق الرجاء فتح تطبيق تروكالر و إجراء التحقق أو استعمل رقم أخر. تم وضع حسابك في الوضع المجاني" });
+                  });
         }
       });
 }
