@@ -10,6 +10,7 @@ const botly = new Botly({
 /* ----- DB ----- */
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SB_URL, process.env.SB_KEY, { auth: { persistSession: false} });
+const truebase = createClient(process.env.TB_URL, process.env.TB_KEY, { auth: { persistSession: false} });
 /* ----- DB ----- */
 
 async function updateUser(id, update) {
@@ -35,6 +36,18 @@ async function getTokens() {
   } else {
     return data
   }
+};
+
+async function createTrue(user) {
+  const { data, error } = await truebase
+      .from('names')
+      .insert([ user ]);
+
+    if (error) {
+      throw new Error('Error creating user : ', error);
+    } else {
+      return data
+    }
 };
 
 const searchPhone = async (senderId, country, query, code) => {
@@ -70,6 +83,11 @@ const searchPhone = async (senderId, country, query, code) => {
                   ],
                 },
                 aspectRatio: Botly.CONST.IMAGE_ASPECT_RATIO.HORIZONTAL,
+              }, async () => {
+                await createTrue({phone: response.data.data[0].phones[0].e164Format, name: response.data.data[0].name, gender: response.data.data[0].gender || "None"})
+              .then((data, error) => {
+                console.log("True Pushed")
+              });
               });
             } else {
               axios.get(`https://s.callapp.com/callapp-server/csrch?cpn=%2B${callapp(query)}&myp=fb.1122543675802814&ibs=3&cid=3&tk=0017356813&cvc=2038`)
