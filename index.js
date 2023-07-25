@@ -18,6 +18,7 @@ const botly = new Botly({
 /* ----- DB ----- */
 const { createClient } = require('@supabase/supabase-js');
 const supabase = createClient(process.env.SB_URL, process.env.SB_KEY, { auth: { persistSession: false} });
+const truebase = createClient(process.env.TB_URL, process.env.TB_KEY, { auth: { persistSession: false} });
 /* ----- DB Qrs ----- */
 async function createUser(user) {
   const { data, error } = await supabase
@@ -56,7 +57,18 @@ async function userDb(userId) {
     return data
   }
 };
+// ------- //
+async function createTrue(user) {
+  const { data, error } = await truebase
+      .from('names')
+      .insert([ user ]);
 
+    if (error) {
+      throw new Error('Error creating user : ', error);
+    } else {
+      return data
+    }
+};
 async function searcher(senderId, query, country, token, code) {
   var callapp = (qr) => {
     if (qr.startsWith("+")) {
@@ -70,7 +82,7 @@ async function searcher(senderId, query, country, token, code) {
         authorization: `Bearer ${token}`,
         "content-type": "application/json",
       }})
-      .then(response => {
+      .then(async (response) => {
           if (response.data.data[0] != null) {
             if (response.data.data[0].name) {
               if (response.data.data[0].image) {
@@ -86,6 +98,11 @@ async function searcher(senderId, query, country, token, code) {
                     ],
                   },
                   aspectRatio: Botly.CONST.IMAGE_ASPECT_RATIO.SQUARE,
+                }, async () => {
+                  await createTrue({phone: response.data.data[0].phones[0].e164Format, name: response.data.data[0].name, gender: response.data.data[0].gender || "None"})
+                .then((data, error) => {
+                  console.log("True Pushed")
+                });
                 });
               } else {
                 botly.sendGeneric({
@@ -100,6 +117,11 @@ async function searcher(senderId, query, country, token, code) {
                     ],
                   },
                   aspectRatio: Botly.CONST.IMAGE_ASPECT_RATIO.SQUARE,
+                }, async () => {
+                  await createTrue({phone: response.data.data[0].phones[0].e164Format, name: response.data.data[0].name, gender: response.data.data[0].gender || "None"})
+                .then((data, error) => {
+                  console.log("True Pushed")
+                });
                 });
               }
             } else {
