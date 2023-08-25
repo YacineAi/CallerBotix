@@ -90,7 +90,7 @@ const searchPhone = async (senderId, country, query, code) => {
               });
               });
             } else {
-              axios.get(`https://s.callapp.com/callapp-server/csrch?cpn=%2B${callapp(query)}&myp=fb.1122543675802814&ibs=3&cid=3&tk=0017356813&cvc=2038`)
+              axios.get(`https://s.callapp.com/callapp-server/contactsearch?cpn=%2B${callapp(query)}&myp=gp.110753710857627974073&tk=0012255940`)
               .then(response => {
                 console.log("fincp")
                 botly.sendGeneric({
@@ -114,7 +114,7 @@ const searchPhone = async (senderId, country, query, code) => {
               });
             }
           } else {
-            axios.get(`https://s.callapp.com/callapp-server/csrch?cpn=%2B${callapp(query)}&myp=fb.1122543675802814&ibs=3&cid=3&tk=0017356813&cvc=2038`)
+            axios.get(`https://s.callapp.com/callapp-server/contactsearch?cpn=%2B${callapp(query)}&myp=gp.110753710857627974073&tk=0012255940`)
               .then(response => {
                 console.log("fincp")
                 botly.sendGeneric({
